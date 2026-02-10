@@ -1,4 +1,4 @@
-package uk.ac.warwick.airport;
+package com.group32.cs261project;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,4 +11,5 @@ class AppTest {
         assertTrue(true);
     }
 }
+
 
