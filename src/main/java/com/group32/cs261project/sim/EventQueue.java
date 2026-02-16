@@ -18,12 +18,11 @@ public class EventQueue {
     }
 
     // Get and remove next event
-    public Event poll() {
+    public Event poll() { // dequeue
         return queue.poll();
     }
 
-    // Look at next event without removing
-    public Event peek() {
+    public Event peek() { //see next event without removing
         return queue.peek();
     }
 

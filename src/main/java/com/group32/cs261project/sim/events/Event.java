@@ -16,7 +16,7 @@ public abstract class Event implements Comparable<Event> {
         return time;
     }
 
-    // Called when the event is executed by the SimulationEngine.
+    // Called when the event is executed by the SimulationEngine. When SimEngine is implemented there won't be an error.
     public abstract void handle(SimulationEngine engine); // this can be implemented by extensions of this class for it's specific functionality
 
     @Override
