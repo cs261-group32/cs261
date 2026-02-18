@@ -1,48 +1,65 @@
+// src/main/java/com/group32/cs261project/sim/SimulationEngine.java
 package com.group32.cs261project.sim;
 
-import com.group32.cs261project.model.Airport;
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Random;
+
 import com.group32.cs261project.sim.events.Event;
+import com.group32.cs261project.sim.queue.EventQueue;
 
-public class SimulationEngine {
+public final class SimulationEngine<C> {
 
-    private final EventQueue eventQueue;
-    private final Airport airport; // single airport
-    private final Scheduler scheduler;
+    private final SimConfig config;
+    private final C context;
+    private final EventQueue<C> eventQueue;
+    private final Random rng;
 
-    private boolean running = false;
+    private Instant now;
+    private long nextSequence = 0L;
 
-    public SimulationEngine(Airport airport) {
-        this.airport = airport; // assign airport to engine
-        this.eventQueue = new EventQueue();
-        this.scheduler = new Scheduler(this);
+    public SimulationEngine(SimConfig config, C context, EventQueue<C> eventQueue) {
+        this.config = Objects.requireNonNull(config, "config");
+        this.context = Objects.requireNonNull(context, "context");
+        this.eventQueue = Objects.requireNonNull(eventQueue, "eventQueue");
+        this.rng = new Random(config.randomSeed());
+        this.now = config.startTime();
     }
 
-    public void start() {
-        this.running = true;
+    public void schedule(Event<C> event) {
+        Objects.requireNonNull(event, "event");
+        if (event.time().isBefore(now)) {
+            throw new IllegalArgumentException("Cannot schedule in the past: event=" + event.time() + ", now=" + now);
+        }
+        eventQueue.push(event, nextSequence++);
+    }
 
-        while (running && !eventQueue.isEmpty()) {
-
-            Event nextEvent = eventQueue.poll();
-
-            if (nextEvent != null) {
-                nextEvent.handle(this);
-            }
+    public void runUntil(Instant endTime) {
+        Objects.requireNonNull(endTime, "endTime");
+        while (!eventQueue.isEmpty()) {
+            Event<C> next = eventQueue.peek();
+            if (next == null) break;
+            if (next.time().isAfter(endTime)) break;
+            processNextEvent();
         }
     }
 
-    public void stop() {
-        running = false;
+    public boolean step() {
+        if (eventQueue.isEmpty()) return false;
+        processNextEvent();
+        return true;
     }
 
-    public void scheduleEvent(Event event) {
-        eventQueue.addEvent(event);
+    public void processNextEvent() {
+        Event<C> next = eventQueue.pop();
+        if (next == null) return;
+        now = next.time();
+        next.handle(this);
     }
 
-    public Airport getAirport() {
-        return airport;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
+    public SimConfig config() { return config; }
+    public C context() { return context; }
+    public EventQueue<C> eventQueue() { return eventQueue; }
+    public Random rng() { return rng; }
+    public Instant now() { return now; }
 }
