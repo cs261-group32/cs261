@@ -3,6 +3,9 @@ package com.group32.cs261project.sim;
 import java.time.Instant;
 import java.util.Objects;
 
+/**
+ * Configuration class for the simulation
+ */
 public final class SimConfig {
     private final Instant startTime;
     private final Instant endTime;

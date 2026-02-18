@@ -8,6 +8,9 @@ import java.util.Random;
 import com.group32.cs261project.sim.events.Event;
 import com.group32.cs261project.sim.queue.EventQueue;
 
+/**
+ * Simulation engine kernel class that handles events
+ */
 public final class SimulationEngine<C> {
 
     private final SimConfig config;
@@ -18,6 +21,12 @@ public final class SimulationEngine<C> {
     private Instant now;
     private long nextSequence = 0L;
 
+    /**
+     * Constructor
+     * @param config
+     * @param context
+     * @param eventQueue
+     */
     public SimulationEngine(SimConfig config, C context, EventQueue<C> eventQueue) {
         this.config = Objects.requireNonNull(config, "config");
         this.context = Objects.requireNonNull(context, "context");
@@ -26,14 +35,22 @@ public final class SimulationEngine<C> {
         this.now = config.startTime();
     }
 
+    /**
+     * Schedules an event to the simulation kernel
+     * @param event
+     */
     public void schedule(Event<C> event) {
         Objects.requireNonNull(event, "event");
         if (event.time().isBefore(now)) {
             throw new IllegalArgumentException("Cannot schedule in the past: event=" + event.time() + ", now=" + now);
         }
-        eventQueue.push(event, nextSequence++);
+        eventQueue.push(event, nextSequence++); // increment sequence number
     }
 
+    /**
+     * Runs the simulation until it finishes
+     * @param endTime
+     */
     public void runUntil(Instant endTime) {
         Objects.requireNonNull(endTime, "endTime");
         while (!eventQueue.isEmpty()) {
@@ -44,12 +61,20 @@ public final class SimulationEngine<C> {
         }
     }
 
+    /**
+     * Steps the simulation forward by one step
+     * @return
+     */
     public boolean step() {
         if (eventQueue.isEmpty()) return false;
         processNextEvent();
         return true;
     }
 
+    /**
+     * Method to process the next event
+     * Pops from the queue and handles that event
+     */
     public void processNextEvent() {
         Event<C> next = eventQueue.pop();
         if (next == null) return;
@@ -57,9 +82,23 @@ public final class SimulationEngine<C> {
         next.handle(this);
     }
 
-    public SimConfig config() { return config; }
-    public C context() { return context; }
-    public EventQueue<C> eventQueue() { return eventQueue; }
-    public Random rng() { return rng; }
-    public Instant now() { return now; }
+    public SimConfig config() { 
+        return config;
+    }
+
+    public C context() {
+        return context;
+    }
+
+    public EventQueue<C> eventQueue() {
+        return eventQueue;
+    }
+
+    public Random rng() {
+        return rng;
+    }
+
+    public Instant now() {
+        return now;
+    }
 }
