@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group32.cs261project.ui.controller.ResultsController" spacing="10">
+  <padding>
+    <Insets top="10" right="10" bottom="10" left="10" />
+  </padding>
+  <Label text="Simulation Inputs:" />
+  <Label fx:id="inputsLabel" />
+  <Label text="Metrics:" />
+  <Label fx:id="metricsLabel" />
+  <Button fx:id="backButton" text="Back to Configure" />
+</VBox>

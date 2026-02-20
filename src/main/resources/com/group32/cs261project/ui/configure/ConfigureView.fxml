@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.group32.cs261project.ui.controller.ConfigureController">
+  <center>
+    <VBox spacing="15" VBox.vgrow="ALWAYS">
+      <padding>
+        <Insets top="15" right="15" bottom="15" left="15" />
+      </padding>
+      <!-- Control Panel -->
+      <GridPane hgap="15" vgap="10" style="-fx-border-color: #e0e0e0; -fx-border-radius: 5; -fx-padding: 10;">
+        <columnConstraints>
+          <ColumnConstraints minWidth="120" prefWidth="150"/>
+          <ColumnConstraints minWidth="200" prefWidth="300" hgrow="ALWAYS"/>
+          <ColumnConstraints minWidth="50" prefWidth="80"/>
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="40"/>
+          <RowConstraints minHeight="40"/>
+          <RowConstraints minHeight="40"/>
+        </rowConstraints>
+
+        <Label text="Inbound (0-30):" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 12;"/>
+        <Slider fx:id="inboundSlider" min="0" max="30" majorTickUnit="5" showTickLabels="true" GridPane.rowIndex="0" GridPane.columnIndex="1" HBox.hgrow="ALWAYS"/>
+        <Label fx:id="inboundLabel" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold; -fx-text-alignment: center;"/>
+
+        <Label text="Outbound (0-30):" GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 12;"/>
+        <Slider fx:id="outboundSlider" min="0" max="30" majorTickUnit="5" showTickLabels="true" GridPane.rowIndex="1" GridPane.columnIndex="1" HBox.hgrow="ALWAYS"/>
+        <Label fx:id="outboundLabel" GridPane.rowIndex="1" GridPane.columnIndex="2" style="-fx-font-weight: bold; -fx-text-alignment: center;"/>
+
+        <Label text="Runways (1-10):" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 12;"/>
+        <Slider fx:id="runwayCountSlider" min="1" max="10" majorTickUnit="1" blockIncrement="1" showTickLabels="true" showTickMarks="true" GridPane.rowIndex="2" GridPane.columnIndex="1" HBox.hgrow="ALWAYS"/>
+        <Label fx:id="runwayCountLabel" GridPane.rowIndex="2" GridPane.columnIndex="2" style="-fx-font-weight: bold; -fx-text-alignment: center;"/>
+      </GridPane>
+
+      <!-- Runway Configuration Panel -->
+      <TitledPane text="Runway Configurations" expanded="true" collapsible="true" VBox.vgrow="ALWAYS">
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+          <VBox fx:id="runwayContainer" spacing="8" style="-fx-border-color: #f0f0f0;">
+            <padding>
+              <Insets top="10" right="10" bottom="10" left="10" />
+            </padding>
+          </VBox>
+        </ScrollPane>
+      </TitledPane>
+
+      <!-- Button Panel -->
+      <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="runButton" text="Run Simulation" style="-fx-font-size: 14; -fx-padding: 10 30 10 30;" prefHeight="45"/>
+      </HBox>
+    </VBox>
+  </center>
+</BorderPane>
