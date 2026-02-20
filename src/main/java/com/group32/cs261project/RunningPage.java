@@ -9,6 +9,7 @@ import javafx.scene.Parent;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -81,6 +82,7 @@ public class RunningPage implements Page {
         Node spinner = buildPlaneSpinnerWithTrack(150, 50); // paneSize, radius
 
         VBox runwayCard = buildRunwayCard();
+        VBox.setVgrow(runwayCard, Priority.ALWAYS);
 
         center.getChildren().addAll(metricsCard, spinner, runwayCard);
         VBox.setVgrow(runwayCard, Priority.ALWAYS);
@@ -186,8 +188,18 @@ public class RunningPage implements Page {
 
         runwayTable.getColumnConstraints().setAll(c0, c1, c2);
 
-        card.getChildren().addAll(header, new Separator(), runwayTable);
-        VBox.setVgrow(runwayTable, Priority.ALWAYS);
+        ScrollPane tableScroll = new ScrollPane(runwayTable);
+        tableScroll.setFitToWidth(true);
+        tableScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+
+        // THIS is what makes the table area expand to fill the empty space
+        tableScroll.setMaxHeight(Double.MAX_VALUE);
+        VBox.setVgrow(tableScroll, Priority.ALWAYS);
+
+        card.getChildren().addAll(header, new Separator(), tableScroll);
+
+        // Let the whole card expand if its parent VBox allows it
+        card.setMaxHeight(Double.MAX_VALUE);
 
         return card;
     }
