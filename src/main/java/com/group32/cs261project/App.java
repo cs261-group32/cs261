@@ -1,25 +1,42 @@
 package com.group32.cs261project;
 
-import com.group32.cs261project.app.stub.StubSimulationService;
-import com.group32.cs261project.ui.MainRouter;
-import com.group32.cs261project.ui.MainRouterHolder;
-import com.group32.cs261project.ui.UiState;
-
 import javafx.application.Application;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 public class App extends Application {
-    public static UiState UI_STATE;
+
+    private Stage stage;
+    private final SimulationService sim = new StubSimulationService();
+
+    private final Map<AppState, Page> pages = new EnumMap<>(AppState.class);
+    private AppState currentState = null;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        // initialize with stub service
-        StubSimulationService stub = new StubSimulationService();
-        UI_STATE = new UiState(stub);
-        MainRouter router = new MainRouter(primaryStage, UI_STATE);
-        UI_STATE = UI_STATE; // keep
-        MainRouterHolder.ROUTER = router;
-        router.showConfigure();
+    public void start(Stage primaryStage) {
+        this.stage = primaryStage;
+
+        // create pages (one file per page)
+        pages.put(AppState.CONFIGURE, new ConfigurePage(this, sim));
+        pages.put(AppState.RUNNING, new RunningPage(this, sim));
+        pages.put(AppState.RESULTS, new ResultsPage(this, sim));
+
+        stage.setTitle("CS261 Airport Simulation (UI Stub)");
+        stage.setScene(new Scene(pages.get(AppState.CONFIGURE).getView(), 900, 600));
+        switchTo(AppState.CONFIGURE, null);
+        stage.show();
+    }
+
+    public void switchTo(AppState next, Object data) {
+        if (currentState != null) pages.get(currentState).onExit();
+        currentState = next;
+
+        Page page = pages.get(next);
+        stage.getScene().setRoot(page.getView());
+        page.onEnter(data);
     }
 
     public static void main(String[] args) {
