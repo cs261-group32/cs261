@@ -1,5 +1,7 @@
 package com.group32.cs261project;
 
+import com.group32.cs261project.SimulationData.RunwayConfig;
+
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
