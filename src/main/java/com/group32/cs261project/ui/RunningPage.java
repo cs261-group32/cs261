@@ -1,4 +1,4 @@
-package com.group32.cs261project;
+package com.group32.cs261project.ui;
 
 import javafx.animation.Animation;
 import javafx.animation.PathTransition;
@@ -19,6 +19,8 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.group32.cs261project.App;
 
 public class RunningPage implements Page {
 

@@ -7,6 +7,14 @@ import javafx.stage.Stage;
 import java.util.EnumMap; 
 import java.util.Map;
 
+import com.group32.cs261project.ui.AppState;
+import com.group32.cs261project.ui.ConfigurePage;
+import com.group32.cs261project.ui.Page;
+import com.group32.cs261project.ui.ResultsPage;
+import com.group32.cs261project.ui.RunningPage;
+import com.group32.cs261project.ui.SimulationService;
+import com.group32.cs261project.ui.StubSimulationService;
+
 public class App extends Application {
 
     private Stage stage; // Main window of the application

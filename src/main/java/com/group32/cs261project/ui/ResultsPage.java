@@ -1,4 +1,6 @@
-package com.group32.cs261project;
+package com.group32.cs261project.ui;
+
+import com.group32.cs261project.App;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

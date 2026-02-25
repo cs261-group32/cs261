@@ -1,4 +1,4 @@
-package com.group32.cs261project;
+package com.group32.cs261project.ui;
 
 import java.util.ArrayList;
 import java.util.List;

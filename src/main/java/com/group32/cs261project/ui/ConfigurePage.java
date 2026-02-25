@@ -1,4 +1,4 @@
-package com.group32.cs261project;
+package com.group32.cs261project.ui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,6 +9,8 @@ import javafx.scene.text.Font;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.group32.cs261project.App;
 
 public class ConfigurePage implements Page {
 
