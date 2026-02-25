@@ -16,10 +16,10 @@ public class ResultsPage implements Page {
 
     private final BorderPane root = new BorderPane();
 
-    // top title
+    // Main Heading
     private final Label title = new Label("End-of-Run Summary");
 
-    // left card dynamic labels
+    // Left card dynamic labels - initially set to "-" until populated with real data onEnter()
     private final Label inboundRateVal = new Label("-");
     private final Label outboundRateVal = new Label("-");
     private final Label runwayCountVal = new Label("-");
@@ -28,7 +28,7 @@ public class ResultsPage implements Page {
     private final Label runwayModesVal = new Label("-");
     private final Label runwayStatusVal = new Label("-");
 
-    // right card dynamic labels
+    // Right card dynamic labels - initially set to "-" until populated with real data onEnter()
     private final Label maxTakeoffQueueVal = new Label("-");
     private final Label avgTakeoffWaitVal = new Label("-");
 
@@ -41,7 +41,7 @@ public class ResultsPage implements Page {
     private final Label cancelledVal = new Label("-");
     private final Label divertedVal = new Label("-");
 
-    // styles (simple, like your screenshot)
+    // ----- Styles -----
     private static final String PAGE_BG = "-fx-background-color: white;";
     private static final String CARD =
             "-fx-background-color: white;" +
@@ -51,41 +51,47 @@ public class ResultsPage implements Page {
             "-fx-background-radius: 10;" +
             "-fx-padding: 18;";
 
+    // ----- Constructor: Builds UI Layout -----
     public ResultsPage(App app, SimulationService sim) {
         this.app = app;
         this.sim = sim;
 
+        // Set background and padding for the whole page
         root.setStyle(PAGE_BG);
         root.setPadding(new Insets(18));
 
-        // ---------- Top ----------
+        // ----- Title at Top -----
         title.setFont(Font.font(28));
         BorderPane.setMargin(title, new Insets(0, 0, 14, 0));
         root.setTop(title);
 
-        // ---------- Main two-column layout ----------
+        // ----- Main Content (two columns) -----
         HBox main = new HBox(22);
 
+        // Build left and right columns with helper methods
         VBox left = buildGeneralInfoCard();
         VBox right = buildRightCards();
 
+        // Allow both columns to expand as the window grows
         HBox.setHgrow(left, Priority.ALWAYS);
         HBox.setHgrow(right, Priority.ALWAYS);
 
+        // Suggested widths so left column is larger tha right
         left.setPrefWidth(520);
         right.setPrefWidth(420);
 
         main.getChildren().addAll(left, right);
         root.setCenter(main);
 
-        // optional back button at bottom (not in screenshot, but useful)
+        // ----- Back Button -----
         Button back = new Button("Back to Configure");
-        back.setOnAction(e -> app.switchTo(AppState.CONFIGURE, null));
+        back.setOnAction(e -> app.switchTo(AppState.CONFIGURE, null)); // When clicked, navigate to Configure Page
         back.setStyle("-fx-background-color: #111; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 10 14;");
         BorderPane.setMargin(back, new Insets(14, 0, 0, 0));
         root.setBottom(back);
     }
 
+    // ----- Page Interface Methods -----
     @Override
     public Parent getView() {
         return root;
@@ -97,16 +103,17 @@ public class ResultsPage implements Page {
         fillFrom(d);
     }
 
-    // ---------------- UI builders ----------------
-
+    // ----- UI Builder: Left Card (General Information) -----
     private VBox buildGeneralInfoCard() {
-        VBox card = new VBox(14);
+        VBox card = new VBox(14); // Creates a card with vertical spacing of 14 between elements
         card.setStyle(CARD);
 
+        // Card header label (bold and larger font)
         Label header = new Label("General Information");
         header.setFont(Font.font(18));
         header.setStyle("-fx-font-weight: 800;");
 
+        // Grid for summary stats
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -116,16 +123,19 @@ public class ResultsPage implements Page {
         addRow(grid, 2, "Number of runways:", runwayCountVal);
         addRow(grid, 3, "Maximum wait time:", maxWaitVal);
 
+        // Separator between summary stats and runway lists
         Separator sep = new Separator();
         sep.setPadding(new Insets(8, 0, 8, 0));
 
-        VBox runwayInfo = new VBox(10);
+        VBox runwayInfo = new VBox(10); // Container for runway lists
 
+        // Header for runway modes list
         Label modesHeader = new Label("Runway operating modes:");
         modesHeader.setStyle("-fx-font-weight: 800;");
 
         runwayModesVal.setWrapText(true);
 
+        // Header for runway statuses list
         Label statusHeader = new Label("Runway operational statuses:");
         statusHeader.setStyle("-fx-font-weight: 800;");
 
@@ -138,15 +148,18 @@ public class ResultsPage implements Page {
 
         VBox.setVgrow(runwayInfo, Priority.ALWAYS);
 
+        // ----- Assemble and return card -----
         card.getChildren().addAll(header, grid, sep, runwayInfo);
         VBox.setVgrow(runwayInfo, Priority.ALWAYS);
 
         return card;
     }
 
+    // ----- UI Builder: Right Column -----
     private VBox buildRightCards() {
-        VBox right = new VBox(16);
+        VBox right = new VBox(16); // Vertical stack of cards with spacing of 16 between them
 
+        // Add cards: Take-off Queue, Holding Pattern, Delays, Cancellations/Diversions
         right.getChildren().addAll(
                 smallCard("Take-off Queue",
                         "Maximum number of planes in take-off queue:", maxTakeoffQueueVal,
@@ -169,17 +182,20 @@ public class ResultsPage implements Page {
         return right;
     }
 
+    // ----- UI Builder: small reusable cards for right column -----
     private VBox smallCard(String titleText,
                            String label1, Label value1,
                            String label2, Label value2) {
 
-        VBox card = new VBox(12);
+        VBox card = new VBox(12); 
         card.setStyle(CARD);
 
+        // Card title
         Label header = new Label(titleText);
         header.setFont(Font.font(18));
         header.setStyle("-fx-font-weight: 800;");
 
+        // Build a 2-row grid
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -187,13 +203,16 @@ public class ResultsPage implements Page {
         addRow(grid, 0, label1, value1);
         addRow(grid, 1, label2, value2);
 
+        // Return the finished card
         card.getChildren().addAll(header, grid);
         return card;
     }
 
+    // ----- Helper Method for Adding Row to Grid -----
     private void addRow(GridPane grid, int row, String labelText, Label valueLabel) {
-        Label l = new Label(labelText);
+        Label l = new Label(labelText); // Create label for the left column
 
+        // Format the right column value label (bold and right-aligned, expands to fill available space)
         valueLabel.setStyle("-fx-font-weight: 800;");
         valueLabel.setAlignment(Pos.CENTER_RIGHT);
         valueLabel.setMaxWidth(Double.MAX_VALUE);
@@ -201,18 +220,18 @@ public class ResultsPage implements Page {
         grid.add(l, 0, row);
         grid.add(valueLabel, 1, row);
 
-        ColumnConstraints c0 = new ColumnConstraints();
+        // ----- Column Constraints -----
+        ColumnConstraints c0 = new ColumnConstraints(); // Column 0 grows to take remaining space for long labels
         c0.setHgrow(Priority.ALWAYS);
 
-        ColumnConstraints c1 = new ColumnConstraints();
+        ColumnConstraints c1 = new ColumnConstraints(); // Column 1 stayes compact so values line up neatly
         c1.setMinWidth(140);
         c1.setHgrow(Priority.NEVER);
 
         grid.getColumnConstraints().setAll(c0, c1);
     }
 
-    // ---------------- Populate values ----------------
-
+    // ----- Results Data -----
     private void fillFrom(SimulationData d) {
         d.ensureRunwayListSize();
 
@@ -222,19 +241,19 @@ public class ResultsPage implements Page {
         runwayCountVal.setText(String.valueOf(d.runwayCount));
         maxWaitVal.setText(String.format("%.2f minutes", (double) d.maxWaitMinutes));
 
-        // runway lists
+        // Runway Mode/Status Lists
         StringBuilder modes = new StringBuilder();
         StringBuilder status = new StringBuilder();
+        // Build multi-line strings for runway modes and statuses
         for (int i = 0; i < d.runways.size(); i++) {
             var r = d.runways.get(i);
-            modes.append("Runway ").append(r.id).append(": ").append(pretty(r.mode.name())).append("\n");
+            modes.append("Runway ").append(r.id).append(": ").append(pretty(r.mode.name())).append("\n"); // Use 'pretty' to convert enum to human-readable text
             status.append("Runway ").append(r.id).append(": ").append(pretty(r.status.name())).append("\n");
         }
         runwayModesVal.setText(modes.toString().trim());
         runwayStatusVal.setText(status.toString().trim());
 
-        // Take-off Queue (we don’t currently track “avg wait time” separately,
-        // so we map it to avgTakeoffQueue as a proxy in minutes like your stub does)
+        // Take-off Queue 
         maxTakeoffQueueVal.setText(String.valueOf(d.maxTakeoffQueue));
         avgTakeoffWaitVal.setText(String.format("%.2f minutes", d.avgTakeoffQueue));
 
@@ -251,15 +270,15 @@ public class ResultsPage implements Page {
         divertedVal.setText(String.valueOf(d.divertedCount));
     }
 
+    // ----- Pretty Helper to Make Enums Readable -----
     private String pretty(String enumName) {
-        // RUNWAY_INSPECTION -> Runway Inspection
-        String lower = enumName.toLowerCase().replace('_', ' ');
+        String lower = enumName.toLowerCase().replace('_', ' '); // Change underscores to spaces eg. RUNWAY_INSPECTION -> Runway Inspection
         String[] parts = lower.split(" ");
         StringBuilder sb = new StringBuilder();
         for (String p : parts) {
             if (p.isBlank()) continue;
-            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1)).append(" ");
+            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1)).append(" "); // Capitalize first letter of each word
         }
-        return sb.toString().trim();
+        return sb.toString().trim(); // Remove trailing space
     }
 }

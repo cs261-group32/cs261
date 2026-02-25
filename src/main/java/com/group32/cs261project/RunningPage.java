@@ -27,23 +27,23 @@ public class RunningPage implements Page {
 
     private final BorderPane root = new BorderPane();
 
-    // Live metrics
+    // Live metrics - start at 0 before simulation begins
     private final Label simTimeVal = new Label("0");
     private final Label holdingVal = new Label("0");
     private final Label takeoffVal = new Label("0");
 
-    // Runway table
+    // Runway table data structures
     private final GridPane runwayTable = new GridPane();
     private final List<Label> runwayModeVals = new ArrayList<>();
     private final List<Label> runwayStatusVals = new ArrayList<>();
 
-    // Spinner animation (so we can stop it on exit)
+    // Spinner animation (possibly temporary until we do graphics)
     private PathTransition spinnerAnim;
 
     // Keep last config for restart
     private SimulationData currentConfig;
 
-    // Styles (match your other pages)
+    // ----- Style constants -----
     private static final String PAGE_BG = "-fx-background-color: white;";
     private static final String CARD =
             "-fx-background-color: white;" +
@@ -66,7 +66,7 @@ public class RunningPage implements Page {
         root.setStyle(PAGE_BG);
         root.setPadding(new Insets(18));
 
-        // ---- Title ----
+        // Title
         Label title = new Label("Running Simulation");
         title.setFont(Font.font(28));
         BorderPane.setMargin(title, new Insets(0, 0, 14, 0));

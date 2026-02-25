@@ -17,39 +17,46 @@ public class ConfigurePage implements Page {
 
     private final BorderPane root = new BorderPane();
 
-    // sliders
+    // Sliders
     private final Slider runwaySlider = new Slider(1, 10, 2);
     private final Slider inboundSlider = new Slider(0, 30, 30);
     private final Slider outboundSlider = new Slider(0, 30, 30);
 
+    // Labels showing current slider values
     private final Label runwayValue = new Label();
     private final Label inboundValue = new Label();
     private final Label outboundValue = new Label();
 
     private final Label errorLabel = new Label();
 
+    // Runway grid and cards - each card represents one runway and has controls for its config
     private final GridPane runwayGrid = new GridPane();
     private final List<RunwayCard> runwayCards = new ArrayList<>();
 
+    // Holds the current config values for the simulation. When user clicks "Run", this is validated and passed to the RunningPage.
     private SimulationData data = new SimulationData();
 
-    // ---------- styling helpers ----------
+    // ----- Styling Constants -----
+    // Page background
     private static final String PAGE_BG = "-fx-background-color: white;";
     private static final String PANEL =
-            "-fx-background-color: white;" +
+            "-fx-background-color: white;" + 
             "-fx-border-color: #111;" +
             "-fx-border-width: 1;" +
             "-fx-padding: 16;";
+    // Runway cards (active)
     private static final String CARD =
             "-fx-background-color: white;" +
             "-fx-border-color: #111;" +
             "-fx-border-width: 1;" +
             "-fx-padding: 14;";
+    // Runway cards (disabled)
     private static final String CARD_DISABLED =
             "-fx-background-color: #e9ecef;" +
             "-fx-border-color: #111;" +
             "-fx-border-width: 1;" +
             "-fx-padding: 14;";
+    // Button styles
     private static final String BTN_PRIMARY =
             "-fx-background-color: #111; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 10 14;";
     private static final String BTN_DANGER =
@@ -67,11 +74,12 @@ public class ConfigurePage implements Page {
         this.app = app;
         this.sim = sim;
 
+        // Apply page background style and padding
         root.setStyle(PAGE_BG);
         root.setPadding(new Insets(16));
 
-        // ---------- Header (title + subtitle) ----------
-        VBox header = new VBox(4);
+        // ----- Header (title + subtitle) -----
+        VBox header = new VBox(4); // Vertical box with spacing of 4px between title and subtitle
         Label title = new Label("✈ Airport Traffic Simulation System");
         title.setFont(Font.font(26));
         Label subtitle = new Label("model aircraft throughput and analyse runway configurations");
@@ -81,25 +89,25 @@ public class ConfigurePage implements Page {
         header.setPadding(new Insets(0, 0, 12, 0));
         root.setTop(header);
 
-        // ---------- Main split: left sidebar + right content ----------
-        HBox main = new HBox(18);
+        // ----- Main Layout: left sidebar + right content -----
+        HBox main = new HBox(18); // Horizontal box with spacing of 18px between sidebar and content
         main.setPadding(new Insets(8, 0, 0, 0));
 
         VBox leftSidebar = buildLeftSidebar();
         VBox rightContent = buildRightContent();
 
-        HBox.setHgrow(rightContent, Priority.ALWAYS);
+        HBox.setHgrow(rightContent, Priority.ALWAYS); // Let right side expand to fill remaining width
 
         main.getChildren().addAll(leftSidebar, rightContent);
         root.setCenter(main);
 
-        // initial values
+        // Initial Setup
         initSliders();
         loadIntoControls(data);
         buildRunwayCards();
         refreshRunwayGrid();
 
-        // listeners
+        // Slider Listeners - update data and labels in real time as user drags sliders
         runwaySlider.valueProperty().addListener((obs, o, n) -> {
             data.runwayCount = (int) Math.round(n.doubleValue());
             runwayValue.setText(String.valueOf(data.runwayCount));
@@ -118,6 +126,7 @@ public class ConfigurePage implements Page {
         });
     }
 
+    // ----- Page Interface Methods -----
     @Override
     public Parent getView() {
         return root;
@@ -128,26 +137,26 @@ public class ConfigurePage implements Page {
         // keep last state
     }
 
-    // ---------------- UI builders ----------------
-
+    // ----- UI Builder for left side content -----
     private VBox buildLeftSidebar() {
-        VBox left = new VBox(16);
+        VBox left = new VBox(16); // Vertical box with spacing of 16px between sections
         left.setPrefWidth(380);
 
         // Simulation Control panel
-        VBox simPanel = new VBox(14);
-        simPanel.setStyle(PANEL);
+        VBox simPanel = new VBox(14); // Vertical box with spacing of 14px between controls
+        simPanel.setStyle(PANEL); // Apply panel styling (white background, border, padding)
 
         Label simTitle = new Label("Simulation Control");
         simTitle.setFont(Font.font(20));
 
         // Number of runways
-        VBox runwayRow = new VBox(6);
+        VBox runwayRow = new VBox(6); // Vertical box with spacing of 6px between label and slider
         Label runwayLabel = new Label("Number of Runways: ");
-        HBox runwayLine = new HBox(6, runwayLabel, runwayValue);
+        HBox runwayLine = new HBox(6, runwayLabel, runwayValue); // Horizontal box to put label and value on the same line with spacing of 6px
         runwayLine.setAlignment(Pos.CENTER_LEFT);
         runwayRow.getChildren().addAll(runwayLine, runwaySlider);
 
+        // Run button - on click, confirm inputs are valid, then switch to RunningPage and pass the current config data
         Button runBtn = new Button("▶  Run Simulation");
         runBtn.setMaxWidth(Double.MAX_VALUE);
         runBtn.setStyle(BTN_PRIMARY);
@@ -155,12 +164,14 @@ public class ConfigurePage implements Page {
 
         // (NO end simulation button)
 
+        // Save button - **CURRENTLY UNIMPLEMENTED**, shows error message whe clicked for now 
         Button saveBtn = new Button("💾  Save Simulation");
         saveBtn.setMaxWidth(Double.MAX_VALUE);
         saveBtn.setStyle(BTN_SUCCESS);
         // stub: you can wire this later
         saveBtn.setOnAction(e -> errorLabel.setText("Save not implemented yet."));
 
+        // Undo/Redo/Reset buttons - **CURRENTLY UNIMPLEMENTED**, shows error message when clicked for now
         HBox undoRedoReset = new HBox(10);
         Button undoBtn = new Button("↶  Undo");
         Button redoBtn = new Button("↷  Redo");
@@ -172,6 +183,8 @@ public class ConfigurePage implements Page {
 
         undoBtn.setOnAction(e -> errorLabel.setText("Undo not implemented yet."));
         redoBtn.setOnAction(e -> errorLabel.setText("Redo not implemented yet."));
+        
+        // Reset button clears all inputs and resets to default config
         resetBtn.setOnAction(e -> {
             data = new SimulationData();
             loadIntoControls(data);
@@ -193,17 +206,19 @@ public class ConfigurePage implements Page {
         simPanel.getChildren().addAll(simTitle, runwayRow, runBtn, saveBtn, undoRedoReset);
 
         // Aircraft Generation panel
-        VBox aircraftPanel = new VBox(14);
+        VBox aircraftPanel = new VBox(14); // Vertical box with spacing of 14px between controls
         aircraftPanel.setStyle(PANEL);
 
         Label aircraftTitle = new Label("Aircraft Generation");
         aircraftTitle.setFont(Font.font(20));
 
+        // Inbound flow rate slider + label
         VBox inboundBox = new VBox(6);
         HBox inboundLine = new HBox(6, new Label("Arrival Rate:"), inboundValue, new Label("/hour"));
         inboundLine.setAlignment(Pos.CENTER_LEFT);
         inboundBox.getChildren().addAll(inboundLine, inboundSlider);
 
+        // Outbound flow rate slider + label
         VBox outboundBox = new VBox(6);
         HBox outboundLine = new HBox(6, new Label("Departure Rate:"), outboundValue, new Label("/hour"));
         outboundLine.setAlignment(Pos.CENTER_LEFT);
@@ -215,18 +230,20 @@ public class ConfigurePage implements Page {
         return left;
     }
 
+    // ----- UI Builder for the right side content -----
     private VBox buildRightContent() {
-        VBox right = new VBox(10);
+        VBox right = new VBox(10); // Vertical box with spacing of 10px between elements
         right.setStyle(PANEL);
 
         Label runwayTitle = new Label("Runway Configuration:");
         runwayTitle.setFont(Font.font(20));
 
+        // Grid spacing and padding
         runwayGrid.setHgap(18);
         runwayGrid.setVgap(18);
         runwayGrid.setPadding(new Insets(8));
 
-        // make columns expand evenly
+        // Make 5 equal-width columns
         for (int c = 0; c < 5; c++) {
             ColumnConstraints cc = new ColumnConstraints();
             cc.setHgrow(Priority.ALWAYS);
@@ -238,14 +255,16 @@ public class ConfigurePage implements Page {
         right.getChildren().addAll(runwayTitle, runwayGrid, errorLabel);
         VBox.setVgrow(runwayGrid, Priority.ALWAYS);
 
+        // Error label styling
         errorLabel.setStyle("-fx-text-fill: #b00020;");
         return right;
     }
 
+    // Initialize slider properties (tick marks, labels, etc.)
     private void initSliders() {
         runwaySlider.setMajorTickUnit(1);
         runwaySlider.setMinorTickCount(0);
-        runwaySlider.setSnapToTicks(true);
+        runwaySlider.setSnapToTicks(true); // Snap to integers
         runwaySlider.setShowTickLabels(false);
         runwaySlider.setShowTickMarks(false);
 
@@ -258,15 +277,14 @@ public class ConfigurePage implements Page {
         outboundSlider.setShowTickMarks(false);
     }
 
-    // ---------------- runway cards ----------------
-
+    // ----- Runway Cards -----
     private void buildRunwayCards() {
-        runwayCards.clear();
+        runwayCards.clear(); // Clear old UI cards
         data.ensureRunwayListSize();
 
         for (int i = 1; i <= 10; i++) {
-            // Ensure we have a runway config object for 1..runwayCount only,
-            // but cards 1..10 always exist visually.
+            // Ensure we have runway cards for 1 to runwayCount only,
+            // but cards 1-10 always exist visually.
             SimulationData.RunwayConfig cfg = (i <= data.runways.size())
                     ? data.runways.get(i - 1)
                     : new SimulationData.RunwayConfig(i);
@@ -280,19 +298,20 @@ public class ConfigurePage implements Page {
 
         runwayGrid.getChildren().clear();
 
-        // rebuild card config references for the active ones
+        // For each card 1-10, get the matching UI object and add to the grid
         for (int i = 1; i <= 10; i++) {
             RunwayCard card = runwayCards.get(i - 1);
 
-            // active configs come from data.runways
+            // Enable active runways - bind cards to the real data object and enable inputs
             if (i <= data.runwayCount) {
                 card.bindTo(data.runways.get(i - 1));
                 card.setEnabled(true);
             } else {
-                // disabled cards still show but are greyed out
+                // Disabled cards still show but are greyed out
                 card.setEnabled(false);
             }
 
+            // Compute grid position
             int idx = i - 1;
             int row = idx / 5;
             int col = idx % 5;
@@ -301,25 +320,29 @@ public class ConfigurePage implements Page {
         }
     }
 
-    // ---------------- data/validation ----------------
-
+    // ----- Data Handling -----
     private void loadIntoControls(SimulationData d) {
         d.ensureRunwayListSize();
 
+        // Set UI slider positions from stored data
         runwaySlider.setValue(d.runwayCount);
         inboundSlider.setValue(d.inboundRatePerHour);
         outboundSlider.setValue(d.outboundRatePerHour);
 
+        // Set numeric labels accordingly
         runwayValue.setText(String.valueOf(d.runwayCount));
         inboundValue.setText(String.valueOf(d.inboundRatePerHour));
         outboundValue.setText(String.valueOf(d.outboundRatePerHour));
     }
 
+    // ----- Run Simulation Button Handler -----
     private void onRun() {
+        // Read values from sliders
         int runways = (int) Math.round(runwaySlider.getValue());
         int in = (int) Math.round(inboundSlider.getValue());
         int out = (int) Math.round(outboundSlider.getValue());
 
+        // Validate runway count and flow rates - if invalid, show error message and don't proceed
         if (runways < 1 || runways > 10) {
             errorLabel.setText("Runway count must be between 1 and 10.");
             return;
@@ -329,20 +352,21 @@ public class ConfigurePage implements Page {
             return;
         }
 
-        errorLabel.setText("");
+        errorLabel.setText(""); // Clear error message
 
+        // Write validated values back into data
         data.runwayCount = runways;
         data.inboundRatePerHour = in;
         data.outboundRatePerHour = out;
         data.ensureRunwayListSize();
 
-        app.switchTo(AppState.RUNNING, data.copy());
+        app.switchTo(AppState.RUNNING, data.copy()); // Navigate to Running Page and pass a copy of the current config data
     }
 
-    // ---------------- runway card component (inner class, NOT extra file) ----------------
+    // ----- Runway card component (inner class) -----
 
     private class RunwayCard {
-        private final VBox root = new VBox(10);
+        private final VBox root = new VBox(10); // Set runway card size and spacing
 
         private final Label title = new Label();
         private final ComboBox<SimulationData.RunwayStatus> statusBox = new ComboBox<>();
@@ -350,6 +374,7 @@ public class ConfigurePage implements Page {
 
         private SimulationData.RunwayConfig bound;
 
+        // Runway card constructor
         RunwayCard(SimulationData.RunwayConfig cfg) {
             root.setStyle(CARD);
             root.setMinWidth(180);
@@ -359,17 +384,18 @@ public class ConfigurePage implements Page {
             Label statusLabel = new Label("Operational Status");
             statusLabel.setStyle("-fx-font-weight: 700;");
 
-            statusBox.getItems().setAll(SimulationData.RunwayStatus.values());
+            statusBox.getItems().setAll(SimulationData.RunwayStatus.values()); // Populate dropdown with enum values
 
             Label modeLabel = new Label("Operating Mode");
             modeLabel.setStyle("-fx-font-weight: 700;");
 
-            modeBox.getItems().setAll(SimulationData.RunwayMode.values());
+            modeBox.getItems().setAll(SimulationData.RunwayMode.values()); // Populate dropdown with enum values
 
             root.getChildren().addAll(title, statusLabel, statusBox, modeLabel, modeBox);
 
-            bindTo(cfg);
+            bindTo(cfg); // Initially bind this card to the provided runway config
 
+            // Listeners to update bound data object when user changes dropdowns - guards against null values
             statusBox.valueProperty().addListener((obs, o, n) -> {
                 if (bound != null && n != null) bound.status = n;
             });
@@ -378,6 +404,7 @@ public class ConfigurePage implements Page {
             });
         }
 
+        // Binding method - connects this UI card to a specific RunwayConfig data object
         void bindTo(SimulationData.RunwayConfig cfg) {
             this.bound = cfg;
             title.setText("Runway " + cfg.id + ":");
@@ -385,6 +412,7 @@ public class ConfigurePage implements Page {
             modeBox.setValue(cfg.mode);
         }
 
+        // Enable or disable this card
         void setEnabled(boolean enabled) {
             root.setStyle(enabled ? CARD : CARD_DISABLED);
             statusBox.setDisable(!enabled);
