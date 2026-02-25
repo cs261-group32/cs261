@@ -43,7 +43,7 @@ public class RunningPage implements Page {
     // Keep last config for restart
     private SimulationData currentConfig;
 
-    // ----- Style constants -----
+    // ----- Styles -----
     private static final String PAGE_BG = "-fx-background-color: white;";
     private static final String CARD =
             "-fx-background-color: white;" +
@@ -72,7 +72,7 @@ public class RunningPage implements Page {
         BorderPane.setMargin(title, new Insets(0, 0, 14, 0));
         root.setTop(title);
 
-        // ---- Center content ----
+        // Centre content
         VBox center = new VBox(18);
         center.setPadding(new Insets(0));
 
@@ -88,14 +88,14 @@ public class RunningPage implements Page {
         VBox.setVgrow(runwayCard, Priority.ALWAYS);
         root.setCenter(center);
 
-        // ---- Bottom buttons ----
+        // Buttons at bottom of page - end, restart
         Button endBtn = new Button("End Simulation");
         endBtn.setStyle(BTN_PRIMARY);
-        endBtn.setOnAction(e -> onEnd());
+        endBtn.setOnAction(e -> onEnd()); // When "End Simulation" is clicked, stop simulation and navigate to results page
 
         Button restartBtn = new Button("Restart");
         restartBtn.setStyle(BTN_SOFT);
-        restartBtn.setOnAction(e -> onRestart());
+        restartBtn.setOnAction(e -> onRestart()); // When "Restart" is clicked, stop simulation and navigate back to configure page 
 
         HBox buttons = new HBox(14, endBtn, restartBtn);
         buttons.setAlignment(Pos.CENTER_LEFT);
@@ -103,6 +103,7 @@ public class RunningPage implements Page {
         root.setBottom(buttons);
     }
 
+    // ----- Page Interface Methods -----
     @Override
     public Parent getView() {
         return root;
@@ -113,7 +114,7 @@ public class RunningPage implements Page {
         currentConfig = ((SimulationData) data).copy();
         currentConfig.ensureRunwayListSize();
 
-        // reset UI
+        // Reset UI
         simTimeVal.setText("0");
         holdingVal.setText("0");
         takeoffVal.setText("0");
@@ -121,12 +122,12 @@ public class RunningPage implements Page {
         rebuildRunwayTable(currentConfig.runwayCount);
         updateRunwayTable(currentConfig);
 
-        // start animation
+        // Start spinner animation
         if (spinnerAnim != null) {
             spinnerAnim.playFromStart();
         }
 
-        // start simulation and update UI
+        // Start simulation and update UI on snapshots 
         sim.start(currentConfig, snap -> Platform.runLater(() -> {
             simTimeVal.setText(String.valueOf(snap.simMinute));
             holdingVal.setText(String.valueOf(snap.holdingQueue));
@@ -135,64 +136,73 @@ public class RunningPage implements Page {
         }));
     }
 
+    // Cleanup - stop animation when leaving page
     @Override
     public void onExit() {
-        // stop animation when leaving page
         if (spinnerAnim != null) {
             spinnerAnim.stop();
         }
     }
 
-    // ---------------- UI BUILDERS ----------------
-
+    // ----- UI Builders: Metrics Card-----
     private VBox buildMetricsCard() {
-        VBox card = new VBox(12);
+        VBox card = new VBox(12); 
         card.setStyle(CARD);
 
+        // Heading 
         Label header = new Label("Live Status");
         header.setFont(Font.font(18));
         header.setStyle("-fx-font-weight: 800;");
 
+        // Grid layout for metrics
         GridPane gp = new GridPane();
         gp.setHgap(10);
         gp.setVgap(10);
 
+        // Add rows for each metric
         addRow(gp, 0, "Simulation time:", simTimeVal, "min");
         addRow(gp, 1, "Number of Aircraft in Holding Queue:", holdingVal, "");
         addRow(gp, 2, "Number of Aircraft in Take-off Queue:", takeoffVal, "");
 
+        // Return complete card
         card.getChildren().addAll(header, gp);
         return card;
     }
 
+    // ----- UI Builders: Runway Table -----
     private VBox buildRunwayCard() {
+        // Create a card for the runwat configuration table
         VBox card = new VBox(12);
         card.setStyle(CARD);
 
+        // Header
         Label header = new Label("Runway Configuration");
         header.setFont(Font.font(18));
         header.setStyle("-fx-font-weight: 800;");
 
+        // Spacing between columns and rows
         runwayTable.setHgap(12);
         runwayTable.setVgap(10);
         runwayTable.setPadding(new Insets(6, 0, 0, 0));
 
-        ColumnConstraints c0 = new ColumnConstraints();
-        c0.setMinWidth(110);
+        // Column constraints
+        ColumnConstraints c0 = new ColumnConstraints(); // Runway name column, has minimum width
+        c0.setMinWidth(110); 
 
-        ColumnConstraints c1 = new ColumnConstraints();
+        ColumnConstraints c1 = new ColumnConstraints(); // Column expands with available space
         c1.setHgrow(Priority.ALWAYS);
 
-        ColumnConstraints c2 = new ColumnConstraints();
+        ColumnConstraints c2 = new ColumnConstraints(); // Column expands with available space
         c2.setHgrow(Priority.ALWAYS);
 
         runwayTable.getColumnConstraints().setAll(c0, c1, c2);
 
+        // Put table in a scroll pane in case there are many runways - vertical scrolling only
         ScrollPane tableScroll = new ScrollPane(runwayTable);
         tableScroll.setFitToWidth(true);
         tableScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
-        // THIS is what makes the table area expand to fill the empty space
+        // Scroll area expands vertically when window inscreases in size, but has a max height to prevent it from taking over the whole page if there are many runways
         tableScroll.setMaxHeight(Double.MAX_VALUE);
         VBox.setVgrow(tableScroll, Priority.ALWAYS);
 
@@ -214,6 +224,7 @@ public class RunningPage implements Page {
         StackPane wrap = new StackPane();
         wrap.setAlignment(Pos.CENTER);
 
+        // Centre everything in a fixed-size pane to prevent resizing issues with the animation
         Pane pane = new Pane();
         pane.setPrefSize(paneSize, paneSize);
         pane.setMinSize(paneSize, paneSize);
@@ -222,29 +233,29 @@ public class RunningPage implements Page {
         double cx = paneSize / 2.0;
         double cy = paneSize / 2.0;
 
-        // track circle (visible)
+        // Track circle - light grey stroke with no fill
         Circle track = new Circle(cx, cy, radius);
         track.setFill(null);
         track.setStroke(Color.LIGHTGRAY);
         track.setStrokeWidth(3);
 
-        // path circle (can reuse the track as the path)
+        // pPath circle - invisible, used for animation path
         Circle path = new Circle(cx, cy, radius);
 
-        // plane symbol (simple + works without image assets)
+        // Plane label (use emoji)
         Label plane = new Label("✈");
         plane.setStyle("-fx-font-size: 22px;");
         // initial position doesn't matter; PathTransition will place it on the path
 
-        // animate plane around the circle
-        spinnerAnim = new PathTransition(Duration.seconds(1.8), path, plane);
-        spinnerAnim.setCycleCount(Animation.INDEFINITE);
-        spinnerAnim.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
+        // Animation to move plane along path in a circle, indefinitely 
+        spinnerAnim = new PathTransition(Duration.seconds(1.8), path, plane); // Plane moves around the circle once every 1.8 seconds
+        spinnerAnim.setCycleCount(Animation.INDEFINITE); // Loops forever
+        spinnerAnim.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT); // Keep the plane rotated to follow the path direction
 
-        // Add to pane
+        // Add track and plane to pane
         pane.getChildren().addAll(track, plane);
 
-        // Optional hint text (remove if you don't want it)
+        // Simulation is running text below the spinner
         Label hint = new Label("Simulation running…");
         hint.setStyle("-fx-text-fill: #444;");
 
@@ -255,13 +266,16 @@ public class RunningPage implements Page {
         return wrap;
     }
 
+    // ----- Helper to Add a Row to the Metrics Grid -----
     private void addRow(GridPane gp, int row, String labelText, Label valueLabel, String suffix) {
-        Label l = new Label(labelText);
+        Label l = new Label(labelText); // Left-hand label
 
+        // Format labels
         valueLabel.setStyle("-fx-font-weight: 800;");
         valueLabel.setMaxWidth(Double.MAX_VALUE);
         valueLabel.setAlignment(Pos.CENTER_RIGHT);
 
+        // Put value and suffix (if any) in an HBox to keep them together on the right side of the grid cell
         HBox valueBox = new HBox(6);
         valueBox.setAlignment(Pos.CENTER_RIGHT);
         valueBox.getChildren().add(valueLabel);
@@ -275,23 +289,25 @@ public class RunningPage implements Page {
         gp.add(l, 0, row);
         gp.add(valueBox, 1, row);
 
-        ColumnConstraints c0 = new ColumnConstraints();
+        // Column constraints
+        ColumnConstraints c0 = new ColumnConstraints(); // Column expands 
         c0.setHgrow(Priority.ALWAYS);
 
-        ColumnConstraints c1 = new ColumnConstraints();
+        ColumnConstraints c1 = new ColumnConstraints(); // Columns has minimum width and stays stable
         c1.setMinWidth(220);
         c1.setHgrow(Priority.NEVER);
 
         gp.getColumnConstraints().setAll(c0, c1);
     }
 
-    // ---------------- RUNWAY TABLE ----------------
-
+    // ----- Runway Table Logic -----
     private void rebuildRunwayTable(int runwayCount) {
+        // Clear existing table and labels
         runwayTable.getChildren().clear();
         runwayModeVals.clear();
         runwayStatusVals.clear();
 
+        // Header row
         Label h0 = new Label("Runway");
         Label h1 = new Label("Operating Mode");
         Label h2 = new Label("Operational Status");
@@ -299,13 +315,16 @@ public class RunningPage implements Page {
         h1.setStyle("-fx-font-weight: 800;");
         h2.setStyle("-fx-font-weight: 800;");
 
+        // Add header row at grid row 0
         runwayTable.add(h0, 0, 0);
         runwayTable.add(h1, 1, 0);
         runwayTable.add(h2, 2, 0);
 
+        // ----- Data Rows -----
         for (int i = 0; i < runwayCount; i++) {
-            int row = i + 1;
+            int row = i + 1; 
 
+            // Row labels - mode.status start as "-" until we get the first snapshot from the simulation
             Label name = new Label("Runway " + (i + 1) + ":");
             Label mode = new Label("-");
             Label status = new Label("-");
@@ -313,26 +332,31 @@ public class RunningPage implements Page {
             mode.setStyle("-fx-font-weight: 700;");
             status.setStyle("-fx-font-weight: 700;");
 
+            // Store references so they can be updated later without searching the grid
             runwayModeVals.add(mode);
             runwayStatusVals.add(status);
 
+            // Add row cells to grid
             runwayTable.add(name, 0, row);
             runwayTable.add(mode, 1, row);
             runwayTable.add(status, 2, row);
         }
     }
 
+    // ----- Runway Table Update Logic -----
     private void updateRunwayTable(SimulationData d) {
         d.ensureRunwayListSize();
 
+        // Update rows (only up to the number of runways)
         int n = Math.min(d.runways.size(), runwayModeVals.size());
         for (int i = 0; i < n; i++) {
             var r = d.runways.get(i);
-            runwayModeVals.get(i).setText(pretty(r.mode.name()));
-            runwayStatusVals.get(i).setText(pretty(r.status.name()));
+            runwayModeVals.get(i).setText(pretty(r.mode.name())); // Convert enum to pretty text
+            runwayStatusVals.get(i).setText(pretty(r.status.name())); 
         }
     }
 
+    // ----- Helper to Convert Enum Names to Pretty Text -----
     private String pretty(String enumName) {
         String lower = enumName.toLowerCase().replace('_', ' ');
         String[] parts = lower.split(" ");
@@ -344,14 +368,15 @@ public class RunningPage implements Page {
         return sb.toString().trim();
     }
 
-    // ---------------- ACTIONS ----------------
-
+    // ----- Button Handlers -----
     private void onEnd() {
+        // Stop the simulation and get final report, then navigate to results page
         SimulationData report = sim.stop();
         app.switchTo(AppState.RESULTS, report);
     }
 
     private void onRestart() {
+        // Stop simulation and go back to Configure Page 
         sim.stop();
         app.switchTo(AppState.CONFIGURE, null);
     }
