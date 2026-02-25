@@ -30,18 +30,6 @@ public class Runway {
         this.occupiedUntil = null;
     }
 
-    public boolean isAvailableForLanding(LocalDateTime time) {
-        return false;
-    }
-
-    public boolean isAvailableForTakeOff(LocalDateTime time) {
-        return false;
-    }
-
-    public void occupyUntil(LocalDateTime time) {
-
-    }
-
     public int runwayNumber() {
         return this.runwayNumber;
     }
@@ -62,20 +50,33 @@ public class Runway {
         return this.status;
     }
 
+    public boolean isAvailableForLanding(LocalDateTime time) {
+        return false;
+    }
+
+    public boolean isAvailableForTakeOff(LocalDateTime time) {
+        return false;
+    }
+
     public LocalDateTime occupiedUntil() {
         return this.occupiedUntil;
     }
+
+    public void occupyUntil(LocalDateTime time) {
+        if (!this.isOccupied(time))
+            this.occupiedUntil = time;
+    }
     
     public boolean isOccupied(LocalDateTime time) {
-        return false;    
+        return (this.occupiedUntil == null || this.occupiedUntil.isBefore(time));
     }
     
     public void clearOccupancy() {
-
+        this.occupiedUntil = null;
     }
 
     public LocalDateTime nextAvailableTime(LocalDateTime time) {
-        return null;
+        return this.isOccupied(time) ? this.occupiedUntil : time;
     }
 
     public void setMode(RunwayMode newMode) {
@@ -85,7 +86,4 @@ public class Runway {
     public void setStatus(RunwayStatus newStatus) {
         this.status = newStatus;
     }
-
-
-    
 }
