@@ -1,4 +1,4 @@
-package com.group32.cs261project;
+package com.group32.cs261project.ui;
 
 import java.util.Random;
 import java.util.concurrent.Executors;
