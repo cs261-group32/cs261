@@ -43,18 +43,24 @@ public class ConfigurePage implements Page {
             "-fx-background-color: white;" + 
             "-fx-border-color: #111;" +
             "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-background-radius: 10;" +
             "-fx-padding: 16;";
     // Runway cards (active)
     private static final String CARD =
             "-fx-background-color: white;" +
             "-fx-border-color: #111;" +
             "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-background-radius: 10;" +
             "-fx-padding: 14;";
     // Runway cards (disabled)
     private static final String CARD_DISABLED =
             "-fx-background-color: #e9ecef;" +
             "-fx-border-color: #111;" +
             "-fx-border-width: 1;" +
+            "-fx-border-radius: 10;" +
+            "-fx-background-radius: 10;" +
             "-fx-padding: 14;";
     // Button styles
     private static final String BTN_PRIMARY =
