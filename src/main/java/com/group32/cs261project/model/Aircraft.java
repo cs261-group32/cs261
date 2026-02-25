@@ -82,6 +82,14 @@ public class Aircraft {
         return this.scheduledTime;
     }
 
+    public EmergencyStatus emergencyStatus() {
+        return this.emergency;
+    }
+
+    public boolean isEmergency() {
+        return this.emergency != EmergencyStatus.NONE;
+    }
+
     // extra function
     public double delayMinutes(LocalDateTime actualTime) {
         return Duration.between(actualTime, this.scheduledTime).toMinutes();

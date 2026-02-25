@@ -8,23 +8,23 @@ import com.group32.cs261project.model.Aircraft;
 
 public class TakeoffQueue {
 
-    private Queue<Aircraft> queue;
+    private final Queue<Aircraft> queue;
 
     public TakeoffQueue() {
         this.queue = new LinkedList<>();
-
     }
 
-    public void enqueue(Aircraft a, LocalDateTime t) {
-
+    public void enqueue(Aircraft aircraft, LocalDateTime time) {
+        aircraft.markTakeoffQueue(time);
+        this.queue.add(aircraft);
     }
 
     public Aircraft peek() {
-        return null;
+        return this.queue.peek();
     }
 
     public Aircraft dequeue() {
-        return null;
+        return this.queue.poll();
     }
 
     public int size() {
@@ -34,5 +34,5 @@ public class TakeoffQueue {
     public boolean isEmpty() {
         return queue.isEmpty();
     }
-    
+
 }
