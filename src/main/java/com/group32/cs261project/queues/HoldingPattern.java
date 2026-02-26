@@ -11,6 +11,9 @@ public class HoldingPattern {
     private final Queue<Aircraft> emergencyQueue;
     private final Queue<Aircraft> normalQueue;
 
+    /**
+     * Constructor
+     */
     public HoldingPattern() {
         this.emergencyQueue = new LinkedList<>();
         this.normalQueue = new LinkedList<>();
@@ -69,7 +72,4 @@ public class HoldingPattern {
             return this.normalQueue.poll();
         }
     }
-
-
-    
 }
