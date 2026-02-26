@@ -2,6 +2,7 @@ package com.group32.cs261project.model;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import com.group32.cs261project.model.enums.RunwayMode;
 import com.group32.cs261project.model.enums.RunwayStatus;
@@ -83,13 +84,13 @@ public class Airport {
      * @param time datetime to check
      * @return an available runway or null if none available
      */
-    public Runway findAvailableLandingRunway(Instant time) {
+    public Optional<Runway> findAvailableLandingRunway(Instant time) {
         for (Runway runway : this.runways) {
             if (runway.isAvailableForLanding(time)) {
-                return runway;
+                return Optional.of(runway);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
@@ -97,13 +98,13 @@ public class Airport {
      * @param time datetime to check
      * @return an available runway or null if none available
      */
-    public Runway findAvailableTakeoffRunway(Instant time) {
+    public Optional<Runway> findAvailableTakeoffRunway(Instant time) {
         for (Runway runway : this.runways) {
             if (runway.isAvailableForTakeOff(time)) {
-                return runway;
+                return Optional.of(runway);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
 
