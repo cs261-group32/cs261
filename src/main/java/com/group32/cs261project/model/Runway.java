@@ -97,10 +97,11 @@ public class Runway {
      * @return true if available
      */
     public boolean isAvailableForLanding(Instant time) {
-        if (this.mode == RunwayMode.LANDING || this.mode == RunwayMode.MIXED) {
-            return !this.isOccupied(time);
-        }
-        return false;
+        if (this.status != RunwayStatus.AVAILABLE)
+            return false;
+        if (this.mode != RunwayMode.LANDING && this.mode != RunwayMode.MIXED)
+            return false;
+        return !this.isOccupied(time);
     }
 
     /**
@@ -109,10 +110,11 @@ public class Runway {
      * @return true if available
      */
     public boolean isAvailableForTakeOff(Instant time) {
-        if (this.mode == RunwayMode.TAKEOFF || this.mode == RunwayMode.MIXED) {
-            return !this.isOccupied(time);
-        }
-        return false;
+        if (this.status != RunwayStatus.AVAILABLE)
+            return false;
+        if (this.mode != RunwayMode.TAKEOFF && this.mode != RunwayMode.MIXED)
+            return false;
+        return !this.isOccupied(time);
     }
 
     /**
@@ -138,7 +140,7 @@ public class Runway {
      * @return true if occupied
      */
     public boolean isOccupied(Instant time) {
-        return (this.occupiedUntil == null || this.occupiedUntil.isBefore(time));
+        return (this.occupiedUntil != null && this.occupiedUntil.isAfter(time));
     }
     
     /**
