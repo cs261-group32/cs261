@@ -1,12 +1,12 @@
 package com.group32.cs261project.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import com.group32.cs261project.model.enums.RunwayMode;
 import com.group32.cs261project.model.enums.RunwayStatus;
 import com.group32.cs261project.queues.HoldingPattern;
-import com.group32.cs261project.queues.TakeoffQueue;
+import com.group32.cs261project.queues.TakeOffQueue;
 
 /**
  * Class for Airport
@@ -15,7 +15,7 @@ public class Airport {
 
     private final List<Runway> runways;
     private final HoldingPattern holdingPattern;
-    private final TakeoffQueue takeoffQueue;
+    private final TakeOffQueue takeoffQueue;
 
     /**
      * Constructor
@@ -24,7 +24,7 @@ public class Airport {
     public Airport(List<Runway> runways) {
         this.runways = runways;
         this.holdingPattern = new HoldingPattern();
-        this.takeoffQueue = new TakeoffQueue();
+        this.takeoffQueue = new TakeOffQueue();
     }
 
     /**
@@ -47,7 +47,7 @@ public class Airport {
      * Getter for take off queue
      * @return takeoff queue object
      */
-    public TakeoffQueue takeoffQueue() {
+    public TakeOffQueue takeoffQueue() {
         return this.takeoffQueue;
     }
 
@@ -83,7 +83,7 @@ public class Airport {
      * @param time datetime to check
      * @return an available runway or null if none available
      */
-    public Runway findAvailableLandingRunway(LocalDateTime time) {
+    public Runway findAvailableLandingRunway(Instant time) {
         for (Runway runway : this.runways) {
             if (runway.isAvailableForLanding(time)) {
                 return runway;
@@ -97,7 +97,7 @@ public class Airport {
      * @param time datetime to check
      * @return an available runway or null if none available
      */
-    public Runway findAvailableTakeoffRunway(LocalDateTime time) {
+    public Runway findAvailableTakeoffRunway(Instant time) {
         for (Runway runway : this.runways) {
             if (runway.isAvailableForTakeOff(time)) {
                 return runway;

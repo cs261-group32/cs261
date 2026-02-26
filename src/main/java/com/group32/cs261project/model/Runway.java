@@ -1,6 +1,6 @@
 package com.group32.cs261project.model;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 import com.group32.cs261project.model.enums.RunwayMode;
@@ -16,7 +16,7 @@ public class Runway {
     private final int bearingDeg;
     private RunwayMode mode;
     private RunwayStatus status;
-    private LocalDateTime occupiedUntil;
+    private Instant occupiedUntil;
 
     /**
      * Constructor
@@ -96,7 +96,7 @@ public class Runway {
      * @param time time to check
      * @return true if available
      */
-    public boolean isAvailableForLanding(LocalDateTime time) {
+    public boolean isAvailableForLanding(Instant time) {
         if (this.mode == RunwayMode.LANDING || this.mode == RunwayMode.MIXED) {
             return !this.isOccupied(time);
         }
@@ -108,7 +108,7 @@ public class Runway {
      * @param time time to check
      * @return true if available
      */
-    public boolean isAvailableForTakeOff(LocalDateTime time) {
+    public boolean isAvailableForTakeOff(Instant time) {
         if (this.mode == RunwayMode.TAKEOFF || this.mode == RunwayMode.MIXED) {
             return !this.isOccupied(time);
         }
@@ -119,7 +119,7 @@ public class Runway {
      * Getter for time the runway is occupied until
      * @return a time if the runway is occupied, null otherwise
      */
-    public LocalDateTime occupiedUntil() {
+    public Instant occupiedUntil() {
         return this.occupiedUntil;
     }
 
@@ -127,7 +127,7 @@ public class Runway {
      * set runway to be occupied until a given time
      * @param time time to set
      */
-    public void occupyUntil(LocalDateTime time) {
+    public void occupyUntil(Instant time) {
         if (!this.isOccupied(time))
             this.occupiedUntil = time;
     }
@@ -137,7 +137,7 @@ public class Runway {
      * @param time time to check
      * @return true if occupied
      */
-    public boolean isOccupied(LocalDateTime time) {
+    public boolean isOccupied(Instant time) {
         return (this.occupiedUntil == null || this.occupiedUntil.isBefore(time));
     }
     
@@ -153,7 +153,7 @@ public class Runway {
      * @param time current time
      * @return current time if available, otherwise next available time
      */
-    public LocalDateTime nextAvailableTime(LocalDateTime time) {
+    public Instant nextAvailableTime(Instant time) {
         return this.isOccupied(time) ? this.occupiedUntil : time;
     }
 }

@@ -1,6 +1,6 @@
 package com.group32.cs261project.queues;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -19,7 +19,7 @@ public class HoldingPattern {
     /**
      * Enqueue an aircraft to the holding pattern given its time
      */
-    public void enqueue(Aircraft aircraft, LocalDateTime time) {
+    public void enqueue(Aircraft aircraft, Instant time) {
         
         aircraft.markHolding(time);
 

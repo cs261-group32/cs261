@@ -1,7 +1,7 @@
 package com.group32.cs261project.model;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 import com.group32.cs261project.model.enums.AircraftState;
@@ -16,12 +16,12 @@ public class Aircraft {
     private final String operator;
     private final String origin;
     private final String destination;
-    private final LocalDateTime scheduledTime;
+    private final Instant scheduledTime;
     private final EmergencyStatus emergency;
-    private float fuelMinutesRemaining;
+    private double fuelMinutesRemaining;
     private AircraftState state;
-    private LocalDateTime holdingEntryTime;
-    private LocalDateTime takeoffQueueEntrytIme;
+    private Instant holdingEntryTime;
+    private Instant takeOffQueueEntryTime;
 
     /**
      * Constructor
@@ -34,19 +34,10 @@ public class Aircraft {
      * @param fuelMinutesRemaining
      * @param state
      * @param holdingEntryTime
-     * @param takeoffQueueEntryTime
+     * @param takeOffQueueEntryTime
      */
-    public Aircraft(
-        String callsign, 
-        String operator, 
-        String origin, 
-        String destination, 
-        LocalDateTime scheduledTime,
-        EmergencyStatus emergency,
-        float fuelMinutesRemaining,
-        AircraftState state,
-        LocalDateTime holdingEntryTime,
-        LocalDateTime takeoffQueueEntryTime
+    public Aircraft(String callsign, String operator, String origin, String destination, 
+                    Instant scheduledTime, EmergencyStatus emergency, double fuelMinutesRemaining, AircraftState state
     ) {
         this.callsign = Objects.requireNonNull(callsign);
         this.operator = Objects.requireNonNull(operator);
@@ -56,8 +47,8 @@ public class Aircraft {
         this.emergency = Objects.requireNonNull(emergency);
         this.fuelMinutesRemaining = fuelMinutesRemaining;
         this.state = Objects.requireNonNull(state);
-        this.holdingEntryTime = holdingEntryTime;
-        this.takeoffQueueEntrytIme = takeoffQueueEntryTime;
+        this.holdingEntryTime = null;
+        this.takeOffQueueEntryTime = null;
 
     }
 
@@ -78,7 +69,7 @@ public class Aircraft {
         return this.destination;
     }
 
-    public LocalDateTime scheduledTime() {
+    public Instant scheduledTime() {
         return this.scheduledTime;
     }
 
@@ -90,20 +81,32 @@ public class Aircraft {
         return this.emergency != EmergencyStatus.NONE;
     }
 
+    public AircraftState state() {
+        return this.state;
+    }
+
+    public Instant holdingPatternEntryTime() {
+        return this.holdingEntryTime;
+    }
+
+    public Instant takeOffQueueEntryTime() {
+        return this.takeOffQueueEntryTime;
+    }
+
     // extra function
-    public double delayMinutes(LocalDateTime actualTime) {
+    public double delayMinutes(Instant actualTime) {
         return Duration.between(actualTime, this.scheduledTime).toMinutes();
     }
 
     // state transition
-    public void markHolding(LocalDateTime entryTime) {
+    public void markHolding(Instant entryTime) {
         this.state = AircraftState.HOLDING;
         this.holdingEntryTime = entryTime;
     }
 
-    public void markTakeoffQueue(LocalDateTime entryTime) {
+    public void markTakeoffQueue(Instant entryTime) {
         this.state = AircraftState.TAKEOFF_QUEUE;
-        this.takeoffQueueEntrytIme = entryTime;
+        this.takeOffQueueEntryTime = entryTime;
     }
 
     public void markRunwayZone() {
