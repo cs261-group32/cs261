@@ -63,7 +63,7 @@ public final class SimulationEngine<C> {
 
     /**
      * Steps the simulation forward by one step
-     * @return
+     * @return true if can step, false if completed
      */
     public boolean step() {
         if (eventQueue.isEmpty()) return false;
