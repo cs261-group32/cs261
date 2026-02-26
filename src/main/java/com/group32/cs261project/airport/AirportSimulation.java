@@ -1,12 +1,11 @@
 package com.group32.cs261project.airport;
 
 import java.time.Instant;
-import java.util.List;
 
 import com.group32.cs261project.model.Airport;
-import com.group32.cs261project.model.Runway;
 import com.group32.cs261project.sim.SimConfig;
 import com.group32.cs261project.sim.SimulationEngine;
+import com.group32.cs261project.sim.queue.PriorityEventQueue;
 
 /**
  * Main class for the backend airport simulation
@@ -20,12 +19,12 @@ public class AirportSimulation {
     /**
      * Constructor
      * @param config Configuration for the airport simulation
-     * @param runways List of runways
+     * @param airport airport object
      */
-    public AirportSimulation(SimConfig config, List<Runway> runways) {
+    public AirportSimulation(SimConfig config, Airport airport) {
         this.config = config;
-        this.airport = new Airport(runways);
-        this.engine = new SimulationEngine<>(config, airport, null);
+        this.airport = airport;
+        this.engine = new SimulationEngine<>(config, airport, new PriorityEventQueue<>());
     }
 
     /**
