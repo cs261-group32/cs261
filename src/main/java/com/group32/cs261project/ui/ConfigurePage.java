@@ -38,6 +38,15 @@ public class ConfigurePage implements Page {
     // Holds the current config values for the simulation. When user clicks "Run", this is validated and passed to the RunningPage.
     private SimulationData data = new SimulationData();
 
+    // ----- Undo / Redo Buttons -----
+    private final List<SimulationData> undoStack = new ArrayList<>();
+    private final List<SimulationData> redoStack = new ArrayList<>();
+    private boolean applyingSnapshot = false;
+
+    // References to enable and disable buttons
+    private Button undoBtn;
+    private Button redoBtn;
+
     // ----- Styling Constants -----
     // Page background
     private static final String PAGE_BG = "-fx-background-color: white;";
@@ -72,9 +81,9 @@ public class ConfigurePage implements Page {
     private static final String BTN_SUCCESS =
             "-fx-background-color: #0aa84f; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 10 14;";
     private static final String BTN_SOFT =
-            "-fx-background-color: #8fb0ff; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 8 12;";
+            "-fx-background-color: #2f6dff; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 8 12;";
     private static final String BTN_SOFT_2 =
-            "-fx-background-color: #5f87ff; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 8 12;";
+            "-fx-background-color: #2f6dff; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 8 12;";
     private static final String BTN_SOFT_3 =
             "-fx-background-color: #2f6dff; -fx-text-fill: white; -fx-font-weight: 700; -fx-padding: 8 12;";
 
@@ -115,23 +124,9 @@ public class ConfigurePage implements Page {
         buildRunwayCards();
         refreshRunwayGrid();
 
-        // Slider Listeners - update data and labels in real time as user drags sliders
-        runwaySlider.valueProperty().addListener((obs, o, n) -> {
-            data.runwayCount = (int) Math.round(n.doubleValue());
-            runwayValue.setText(String.valueOf(data.runwayCount));
-            data.ensureRunwayListSize();
-            refreshRunwayGrid();
-        });
-
-        inboundSlider.valueProperty().addListener((obs, o, n) -> {
-            data.inboundRatePerHour = (int) Math.round(n.doubleValue());
-            inboundValue.setText(String.valueOf(data.inboundRatePerHour));
-        });
-
-        outboundSlider.valueProperty().addListener((obs, o, n) -> {
-            data.outboundRatePerHour = (int) Math.round(n.doubleValue());
-            outboundValue.setText(String.valueOf(data.outboundRatePerHour));
-        });
+        runwaySlider.setOnMousePressed(e -> pushUndoSnapshot());
+        inboundSlider.setOnMousePressed(e -> pushUndoSnapshot());
+        outboundSlider.setOnMousePressed(e -> pushUndoSnapshot());
     }
 
     // ----- Page Interface Methods -----
@@ -170,35 +165,26 @@ public class ConfigurePage implements Page {
         runBtn.setStyle(BTN_PRIMARY);
         runBtn.setOnAction(e -> onRun());
 
-        // (NO end simulation button)
-
-        // Save button - **CURRENTLY UNIMPLEMENTED**, shows error message whe clicked for now 
-        Button saveBtn = new Button("💾  Save Simulation");
-        saveBtn.setMaxWidth(Double.MAX_VALUE);
-        saveBtn.setStyle(BTN_SUCCESS);
-        // stub: you can wire this later
-        saveBtn.setOnAction(e -> errorLabel.setText("Save not implemented yet."));
-
-        // Undo/Redo/Reset buttons - **CURRENTLY UNIMPLEMENTED**, shows error message when clicked for now
+        // Undo/Redo/Reset buttons
         HBox undoRedoReset = new HBox(10);
-        Button undoBtn = new Button("↶  Undo");
-        Button redoBtn = new Button("↷  Redo");
+        undoBtn = new Button("↶  Undo");
+        redoBtn = new Button("↷  Redo");
         Button resetBtn = new Button("⟲  Reset");
 
         undoBtn.setStyle(BTN_SOFT);
         redoBtn.setStyle(BTN_SOFT_2);
         resetBtn.setStyle(BTN_SOFT_3);
 
-        undoBtn.setOnAction(e -> errorLabel.setText("Undo not implemented yet."));
-        redoBtn.setOnAction(e -> errorLabel.setText("Redo not implemented yet."));
+        undoBtn.setOnAction(e -> undo());
+        redoBtn.setOnAction(e -> redo());
         
+        updateUndoRedoButtons();
+
         // Reset button clears all inputs and resets to default config
         resetBtn.setOnAction(e -> {
-            data = new SimulationData();
-            loadIntoControls(data);
-            buildRunwayCards();
-            refreshRunwayGrid();
-            errorLabel.setText("");
+            // Allow reset to be undoable by taking a snapshot
+            pushUndoSnapshot();
+            applySnapshot(new SimulationData());
         });
 
         undoBtn.setMaxWidth(Double.MAX_VALUE);
@@ -211,7 +197,7 @@ public class ConfigurePage implements Page {
 
         undoRedoReset.getChildren().addAll(undoBtn, redoBtn, resetBtn);
 
-        simPanel.getChildren().addAll(simTitle, runwayRow, runBtn, saveBtn, undoRedoReset);
+        simPanel.getChildren().addAll(simTitle, runwayRow, runBtn, undoRedoReset);
 
         // Aircraft Generation panel
         VBox aircraftPanel = new VBox(14); // Vertical box with spacing of 14px between controls
@@ -283,6 +269,26 @@ public class ConfigurePage implements Page {
         outboundSlider.setMajorTickUnit(5);
         outboundSlider.setShowTickLabels(false);
         outboundSlider.setShowTickMarks(false);
+
+        runwaySlider.valueProperty().addListener((obs, o, n) -> {
+            if (applyingSnapshot) return;
+                data.runwayCount = (int) Math.round(n.doubleValue());
+                runwayValue.setText(String.valueOf(data.runwayCount));
+                data.ensureRunwayListSize();
+                refreshRunwayGrid();
+        });
+
+        inboundSlider.valueProperty().addListener((obs, o, n) -> {
+            if (applyingSnapshot) return;
+            data.inboundRatePerHour = (int) Math.round(n.doubleValue());
+            inboundValue.setText(String.valueOf(data.inboundRatePerHour));
+        });
+
+        outboundSlider.valueProperty().addListener((obs, o, n) -> {
+            if (applyingSnapshot) return;
+            data.outboundRatePerHour = (int) Math.round(n.doubleValue());
+            outboundValue.setText(String.valueOf(data.outboundRatePerHour));
+        });
     }
 
     // ----- Runway Cards -----
@@ -405,10 +411,18 @@ public class ConfigurePage implements Page {
 
             // Listeners to update bound data object when user changes dropdowns - guards against null values
             statusBox.valueProperty().addListener((obs, o, n) -> {
-                if (bound != null && n != null) bound.status = n;
+                if (applyingSnapshot) return;
+                if (bound != null && n != null) {
+                    pushUndoSnapshot();
+                    bound.status = n;
+                }
             });
             modeBox.valueProperty().addListener((obs, o, n) -> {
-                if (bound != null && n != null) bound.mode = n;
+                if (applyingSnapshot) return;
+                if (bound != null && n != null) {
+                    pushUndoSnapshot();
+                    bound.mode = n;
+                }
             });
         }
 
@@ -427,5 +441,50 @@ public class ConfigurePage implements Page {
             modeBox.setDisable(!enabled);
             root.setOpacity(enabled ? 1.0 : 0.85);
         }
+    }
+
+    // ----- Helper Methods for Undo/Redo Buttons -----
+    private void pushUndoSnapshot(){
+        if (applyingSnapshot) return;
+
+        // Snapshot before the change is applied
+        undoStack.add(data.copy());
+        // Once you make a new change, redo history is invalid
+        redoStack.clear();
+        updateUndoRedoButtons();
+    }
+
+    private void applySnapshot(SimulationData snapshot) {
+        applyingSnapshot = true;
+        try {
+            data = snapshot.copy();     // replace current data
+            loadIntoControls(data);     // sliders and labels
+            buildRunwayCards();         // cards list
+            refreshRunwayGrid();        // bind cards to data.runways
+            errorLabel.setText("");
+        }
+        finally {
+            applyingSnapshot = false;
+            updateUndoRedoButtons();
+        }
+    }
+
+    private void undo() {
+        if (undoStack.isEmpty()) return;
+        redoStack.add(data.copy());     // Save current for redo
+        SimulationData prev = undoStack.remove(undoStack.size() - 1);
+        applySnapshot(prev);
+    }
+
+    private void redo() {
+        if (redoStack.isEmpty()) return;
+        undoStack.add(data.copy());     // Save current for undo
+        SimulationData next = redoStack.remove(redoStack.size() - 1);
+        applySnapshot(next);
+    }
+
+    private void updateUndoRedoButtons() {
+        if (undoBtn != null) undoBtn.setDisable(undoStack.isEmpty());
+        if (redoBtn != null) redoBtn.setDisable(redoStack.isEmpty());
     }
 }

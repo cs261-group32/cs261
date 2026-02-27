@@ -249,8 +249,8 @@ public class ResultsPage implements Page {
         // Build multi-line strings for runway modes and statuses
         for (int i = 0; i < d.runways.size(); i++) {
             var r = d.runways.get(i);
-            modes.append("Runway ").append(r.id).append(": ").append(pretty(r.mode.name())).append("\n"); // Use 'pretty' to convert enum to human-readable text
-            status.append("Runway ").append(r.id).append(": ").append(pretty(r.status.name())).append("\n");
+            modes.append("Runway ").append(r.id).append(": ").append(r.mode).append("\n"); 
+            status.append("Runway ").append(r.id).append(": ").append(r.status).append("\n");
         }
         runwayModesVal.setText(modes.toString().trim());
         runwayStatusVal.setText(status.toString().trim());
@@ -270,17 +270,5 @@ public class ResultsPage implements Page {
         // Cancellations/Diversions
         cancelledVal.setText(String.valueOf(d.cancelledCount));
         divertedVal.setText(String.valueOf(d.divertedCount));
-    }
-
-    // ----- Pretty Helper to Make Enums Readable -----
-    private String pretty(String enumName) {
-        String lower = enumName.toLowerCase().replace('_', ' '); // Change underscores to spaces eg. RUNWAY_INSPECTION -> Runway Inspection
-        String[] parts = lower.split(" ");
-        StringBuilder sb = new StringBuilder();
-        for (String p : parts) {
-            if (p.isBlank()) continue;
-            sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1)).append(" "); // Capitalize first letter of each word
-        }
-        return sb.toString().trim(); // Remove trailing space
     }
 }

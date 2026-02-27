@@ -35,9 +35,36 @@ public class SimulationData {
     public int maxOutboundDelayMin = 0;
 
     // Enums - allowed values for runway config
-    public enum RunwayMode { LANDING, TAKE_OFF, MIXED }
-    public enum RunwayStatus { AVAILABLE, RUNWAY_INSPECTION, SNOW_CLEARANCE, EQUIPMENT_FAILURE }
+    public enum RunwayMode { LANDING, TAKE_OFF, MIXED;
 
+        // ----- Print Enums as Normal Text -----
+        @Override 
+        public String toString() {
+            String lower = name().toLowerCase().replace('_', ' '); // Change underscores to spaces eg. RUNWAY_INSPECTION -> Runway Inspection
+            String[] parts = lower.split(" ");
+            StringBuilder sb = new StringBuilder();
+            for (String p : parts) {
+                if (p.isBlank()) continue;
+                sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1)).append(" "); // Capitalize first letter of each word
+            }
+            return sb.toString().trim(); // Remove trailing space
+        }
+    }
+    public enum RunwayStatus { AVAILABLE, RUNWAY_INSPECTION, SNOW_CLEARANCE, EQUIPMENT_FAILURE;
+
+        // ----- Print Enums as Normal Text -----
+        @Override 
+        public String toString() {
+            String lower = name().toLowerCase().replace('_', ' '); // Change underscores to spaces eg. RUNWAY_INSPECTION -> Runway Inspection
+            String[] parts = lower.split(" ");
+            StringBuilder sb = new StringBuilder();
+            for (String p : parts) {
+                if (p.isBlank()) continue;
+                sb.append(Character.toUpperCase(p.charAt(0))).append(p.substring(1)).append(" "); // Capitalize first letter of each word
+            }
+            return sb.toString().trim(); // Remove trailing space
+        }
+     }
     // --- Runway Config Inner Class -----
     public static class RunwayConfig {
         public final int id; // Runway identifier
