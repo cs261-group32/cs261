@@ -35,6 +35,27 @@ public final class SimulationEngine<C> {
         this.now = config.startTime();
     }
 
+    // getters
+    public SimConfig config() { 
+        return config;
+    }
+
+    public C context() {
+        return context;
+    }
+
+    public EventQueue<C> eventQueue() {
+        return eventQueue;
+    }
+
+    public Random rng() {
+        return rng;
+    }
+
+    public Instant now() {
+        return now;
+    }
+
     /**
      * Schedules an event to the simulation kernel
      * @param event
@@ -63,7 +84,7 @@ public final class SimulationEngine<C> {
 
     /**
      * Steps the simulation forward by one step
-     * @return
+     * @return true if can step, false if completed
      */
     public boolean step() {
         if (eventQueue.isEmpty()) return false;
@@ -82,23 +103,4 @@ public final class SimulationEngine<C> {
         next.handle(this);
     }
 
-    public SimConfig config() { 
-        return config;
-    }
-
-    public C context() {
-        return context;
-    }
-
-    public EventQueue<C> eventQueue() {
-        return eventQueue;
-    }
-
-    public Random rng() {
-        return rng;
-    }
-
-    public Instant now() {
-        return now;
-    }
 }

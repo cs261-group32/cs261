@@ -7,10 +7,17 @@ import java.util.Objects;
  * Configuration class for the simulation
  */
 public final class SimConfig {
+
     private final Instant startTime;
     private final Instant endTime;
     private final long randomSeed;
 
+    /**
+     * Constructor
+     * @param startTime
+     * @param endTime
+     * @param randomSeed
+     */
     public SimConfig(Instant startTime, Instant endTime, long randomSeed) {
         this.startTime = Objects.requireNonNull(startTime, "startTime");
         this.endTime = Objects.requireNonNull(endTime, "endTime");
@@ -20,7 +27,15 @@ public final class SimConfig {
         this.randomSeed = randomSeed;
     }
 
-    public Instant startTime() { return startTime; }
-    public Instant endTime() { return endTime; }
-    public long randomSeed() { return randomSeed; }
+    public Instant startTime() {
+        return startTime;
+    }
+
+    public Instant endTime() {
+        return endTime;
+    }
+
+    public long randomSeed() {
+        return randomSeed;
+    }
 }
