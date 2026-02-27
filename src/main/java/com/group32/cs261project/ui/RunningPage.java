@@ -66,29 +66,43 @@ public class RunningPage implements Page {
         this.sim = sim;
 
         root.setStyle(PAGE_BG);
-        root.setPadding(new Insets(18));
+        HBox mainLayout = new HBox(10); // spacing between columns
+        mainLayout.setPadding(new Insets(18));
 
         // Title
         Label title = new Label("Running Simulation");
         title.setFont(Font.font(28));
-        BorderPane.setMargin(title, new Insets(0, 0, 14, 0));
+        BorderPane.setMargin(title, new Insets(18, 18, 14, 18));
         root.setTop(title);
 
-        // Centre content
-        VBox center = new VBox(18);
-        center.setPadding(new Insets(0));
+        // Left Column
+        VBox leftColumn = new VBox(20);
+        leftColumn.setPrefWidth(400);
+        leftColumn.prefWidthProperty().bind(mainLayout.widthProperty().multiply(0.33));
+        leftColumn.setMinWidth(300);
 
         VBox metricsCard = buildMetricsCard();
-
-        // Spinner (small, fixed size)
-        Node spinner = buildPlaneSpinnerWithTrack(150, 50); // paneSize, radius
-
         VBox runwayCard = buildRunwayCard();
         VBox.setVgrow(runwayCard, Priority.ALWAYS);
 
-        center.getChildren().addAll(metricsCard, spinner, runwayCard);
-        VBox.setVgrow(runwayCard, Priority.ALWAYS);
-        root.setCenter(center);
+        // Make sure cards fit the column width
+        metricsCard.setMaxWidth(Double.MAX_VALUE);
+        runwayCard.setMaxWidth(Double.MAX_VALUE);
+        leftColumn.setFillWidth(true);
+
+        leftColumn.getChildren().addAll(metricsCard, runwayCard);
+        
+        // Spinner (small, fixed size)
+        Node spinner = buildPlaneSpinnerWithTrack(150, 50); // paneSize, radius
+
+        StackPane simulationPane = new StackPane();
+        simulationPane.setAlignment(Pos.CENTER);
+        simulationPane.prefWidthProperty().bind(mainLayout.widthProperty().multiply(0.67));
+        simulationPane.getChildren().add(spinner);
+
+        HBox.setHgrow(simulationPane, Priority.ALWAYS);
+        mainLayout.getChildren().addAll(leftColumn, simulationPane);
+        root.setCenter(mainLayout);
 
         // Buttons at bottom of page - end, restart
         Button endBtn = new Button("End Simulation");
@@ -101,7 +115,7 @@ public class RunningPage implements Page {
 
         HBox buttons = new HBox(14, endBtn, restartBtn);
         buttons.setAlignment(Pos.CENTER_LEFT);
-        buttons.setPadding(new Insets(14, 0, 0, 0));
+        buttons.setPadding(new Insets(0, 18, 18, 18));
         root.setBottom(buttons);
     }
 
@@ -199,16 +213,9 @@ public class RunningPage implements Page {
 
         runwayTable.getColumnConstraints().setAll(c0, c1, c2);
 
-        // Put table in a scroll pane in case there are many runways - vertical scrolling only
-        ScrollPane tableScroll = new ScrollPane(runwayTable);
-        tableScroll.setFitToWidth(true);
-        tableScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
-        // Scroll area expands vertically when window inscreases in size, but has a max height to prevent it from taking over the whole page if there are many runways
-        tableScroll.setMaxHeight(Double.MAX_VALUE);
-        VBox.setVgrow(tableScroll, Priority.ALWAYS);
-
-        card.getChildren().addAll(header, new Separator(), tableScroll);
+        VBox.setVgrow(runwayTable, Priority.ALWAYS);
+        runwayTable.setMaxHeight(Double.MAX_VALUE);
+        card.getChildren().addAll(header, new Separator(), runwayTable);
 
         // Let the whole card expand if its parent VBox allows it
         card.setMaxHeight(Double.MAX_VALUE);
