@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.group32.cs261project.model.Aircraft;
+import com.group32.cs261project.model.enums.AircraftState;
+import com.group32.cs261project.model.enums.EmergencyStatus;
 import com.group32.cs261project.sim.SimConfig;
 
 public class FlightGenerator {
@@ -15,8 +17,8 @@ public class FlightGenerator {
     private final double sigmaMinutes = 5.0;
     private final Instant startTime;
     private final Instant endTime;
-    private final int inboundRatePerHour;
-    private final int outboundRatePerHour;
+    private final double inboundRatePerHour;
+    private final double outboundRatePerHour;
     
     /**
      * Constructor
@@ -38,7 +40,8 @@ public class FlightGenerator {
     private Instant entryTime(Instant scheduledTime) {
         double delayMinutes = rng.nextGaussian() * 5.0;
         long millis = Math.round(delayMinutes * 60_000.0);
-        return scheduledTime.plusMillis(millis);
+        Instant entryTime = scheduledTime.plusMillis(millis);
+        return entryTime.isBefore(startTime) ? startTime : entryTime;
     }
 
     /**
@@ -46,7 +49,7 @@ public class FlightGenerator {
      * @param ratePerHour rate per hour (in or out)
      * @return duration object
      */
-    private Duration interFlightDuration(int ratePerHour) {
+    private Duration interFlightDuration(double ratePerHour) {
         double spacingMinutes = 60.0 / (double) ratePerHour;
         long spacingMillis = Math.round(spacingMinutes * 60_000.0);
         return Duration.ofMillis(spacingMillis);
@@ -71,14 +74,14 @@ public class FlightGenerator {
         while (!t.isAfter(endTime)) {
             flights.add(
                 new GeneratedFlight(new Aircraft(
-                    null,
-                    null,
-                    null,
-                    null,
+                    "callsign",
+                    "operator",
+                    "origin",
+                    "destination",
                     t,
-                    null,
+                    EmergencyStatus.NONE,
                     sigmaMinutes,
-                    null
+                    AircraftState.OUTSIDE_MODEL
                 ), t, this.entryTime(t))
             );
             t = t.plus(spacing);

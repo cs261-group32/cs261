@@ -11,8 +11,8 @@ public final class SimConfig {
     private final Instant startTime;
     private final Instant endTime;
     private final long randomSeed;
-    private final int inboundRatePerHour;
-    private final int outboundRatePerHour;
+    private final double inboundRatePerHour;
+    private final double outboundRatePerHour;
 
     /**
      * Constructor
@@ -20,7 +20,7 @@ public final class SimConfig {
      * @param endTime
      * @param randomSeed
      */
-    public SimConfig(Instant startTime, Instant endTime, long randomSeed, int inboundRatePerHour, int outboundRatePerHour) {
+    public SimConfig(Instant startTime, Instant endTime, long randomSeed, double inboundRatePerHour, double outboundRatePerHour) {
         this.startTime = Objects.requireNonNull(startTime, "startTime");
         this.endTime = Objects.requireNonNull(endTime, "endTime");
         if (endTime.isBefore(startTime)) {
@@ -43,11 +43,11 @@ public final class SimConfig {
         return this.randomSeed;
     }
 
-    public int inboundRatePerHour() {
+    public double inboundRatePerHour() {
         return this.inboundRatePerHour;
     }
 
-    public int outboundRatePerHour() {
+    public double outboundRatePerHour() {
         return this.outboundRatePerHour;
     }
 }

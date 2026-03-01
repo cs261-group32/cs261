@@ -24,7 +24,7 @@ public class AircraftOutboundReadyEvent implements Event<Airport> {
 
     @Override
     public void handle(SimulationEngine<Airport> engine) {
-        engine.context().takeoffQueue().enqueue(aircraft, time);
+        engine.context().takeOffQueue().enqueue(aircraft, time);
     }
 
 

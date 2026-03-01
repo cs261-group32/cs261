@@ -16,7 +16,7 @@ public class Airport {
 
     private final List<Runway> runways;
     private final HoldingPattern holdingPattern;
-    private final TakeOffQueue takeoffQueue;
+    private final TakeOffQueue takeOffQueue;
 
     /**
      * Constructor
@@ -25,7 +25,7 @@ public class Airport {
     public Airport(List<Runway> runways) {
         this.runways = runways;
         this.holdingPattern = new HoldingPattern();
-        this.takeoffQueue = new TakeOffQueue();
+        this.takeOffQueue = new TakeOffQueue();
     }
 
     /**
@@ -48,8 +48,8 @@ public class Airport {
      * Getter for take off queue
      * @return takeoff queue object
      */
-    public TakeOffQueue takeoffQueue() {
-        return this.takeoffQueue;
+    public TakeOffQueue takeOffQueue() {
+        return this.takeOffQueue;
     }
 
     /**
